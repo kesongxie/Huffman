@@ -14,7 +14,7 @@ int main(int argc, char** argv){
     string inputFileName = "checkpoint1_compressed.txt";
     string outputFileName= "checkpoint1_uncompressed.txt";
     string inputFileNameSecond = "checkpoint2_compressed.txt";
-    string outputFileNameSecond= "/checkpoint2_uncompressed.txt";
+    string outputFileNameSecond= "checkpoint2_uncompressed.txt";
     HCTree::uncompress(inputFileName, outputFileName);
     HCTree::uncompress(inputFileNameSecond, outputFileNameSecond);
     return 0;
