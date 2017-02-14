@@ -11,12 +11,12 @@
 #include "HCTree.h"
 
 int main(int argc, char** argv){
-    string inputFileName = "/Users/KesongXie/Developer/CSE100/Huffman/Huffman/checkpoint1.txt";
-    string outputFileName= "/Users/KesongXie/Developer/CSE100/Huffman/Huffman/checkpoint1_compressed.txt";
+    string inputFileName = "checkpoint1.txt";
+    string outputFileName= "checkpoint1_compressed.txt";
     HCTree::compress(inputFileName, outputFileName);
     
-    string inputFileNameSecond = "/Users/KesongXie/Developer/CSE100/Huffman/Huffman/checkpoint2.txt";
-    string outputFileNameSecond= "/Users/KesongXie/Developer/CSE100/Huffman/Huffman/checkpoint2_compressed.txt";
+    string inputFileNameSecond = "checkpoint2.txt";
+    string outputFileNameSecond= "checkpoint2_compressed.txt";
     HCTree::compress(inputFileName, outputFileName);
     HCTree::compress(inputFileNameSecond, outputFileNameSecond);
 
