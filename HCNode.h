@@ -1,3 +1,10 @@
+//
+//  HCNode.h
+//  Huffman
+//
+//  Created by Xie kesong on 2/12/17.
+//  Copyright © 2017 ___KesongXie___. All rights reserved.
+//
 #ifndef HCNODE_H
 #define HCNODE_H
 
@@ -29,7 +36,7 @@ public:
      *  We want small counts to have high priority.
      *  And we want to break ties deterministically.
      */
-    bool operator<(const HCNode& other);
+    bool operator<(const HCNode& other) const;
 };
 
 /** For printing an HCNode to an ostream

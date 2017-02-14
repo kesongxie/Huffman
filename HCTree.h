@@ -1,3 +1,10 @@
+//
+//  HCTree.h
+//  Huffman
+//
+//  Created by Xie kesong on 2/12/17.
+//  Copyright © 2017 ___KesongXie___. All rights reserved.
+//
 #ifndef HCTREE_H
 #define HCTREE_H
 
@@ -79,6 +86,22 @@ public:
      */
     int decode(ifstream& in) const;
 
+    
+    /** compress file for given input file name, and output to the given destination
+     *  @param inputFileName : input file name
+     *  @param outputFileName
+     *  @retrun bool: return true when compression executed successfully, false otherwise
+     */
+    static bool compress(std::string inputFileName, std::string outputFileName);
+    
+    /** uncompress file for given input file name, and output to the given destination
+     *  @param inputFileName : name for the input file to be uncompressed
+     *  @param outputFileName : output file for the uncompressed file
+     *  @retrun bool: return true when uncompression executed successfully, false otherwise
+     */
+    static bool uncompress(std::string inputFileName, std::string outputFileName);
+    
+    
 };
 
 #endif // HCTREE_H
