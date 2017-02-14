@@ -11,15 +11,16 @@
 #include "HCTree.h"
 
 int main(int argc, char** argv){
-    string inputFileName = "checkpoint1.txt";
-    string outputFileName= "checkpoint1_compressed.txt";
-    HCTree::compress(inputFileName, outputFileName);
+    if(argc < 3){
+        std::cerr << "In correct usage, uncompress program requries two arguments, inputFileName and outputFileName" << std::endl;
+        return -1;
+    }
     
-    string inputFileNameSecond = "checkpoint2.txt";
-    string outputFileNameSecond= "checkpoint2_compressed.txt";
+    string inputFileName = *(++argv);
+    std::cout << inputFileName << std::endl;
+    string outputFileName = *(++argv);
+    std::cout << outputFileName << std::endl;
     HCTree::compress(inputFileName, outputFileName);
-    HCTree::compress(inputFileNameSecond, outputFileNameSecond);
-
     return 0;
 }
 
