@@ -12,9 +12,17 @@
 /* descrutor should clear all the dynamic allocation*/
 HCTree::~HCTree(){
     //traverse the tree and delete all the HCNodes
-    //HCNode* root;
-    
+    deallocateAux(root);
 }
+
+void HCTree::deallocateAux(HCNode* p){
+    if(p != NULL){
+        deallocateAux(p->c0);
+        deallocateAux(p->c1);
+        delete p;
+    }
+}
+
 
 /** Use the Huffman algorithm to build a Huffman coding trie.
  *  PRECONDITION: freqs is a vector of ints, such that freqs[i] is

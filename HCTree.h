@@ -37,6 +37,7 @@ class HCTree {
 private:
     HCNode* root;
     vector<HCNode*> leaves;
+    void deallocateAux(HCNode* p);
 
 public:
     // explicit keyword is used to avoid accidental implicit conversions
