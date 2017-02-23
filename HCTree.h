@@ -37,7 +37,11 @@ class HCTree {
 private:
     HCNode* root;
     vector<HCNode*> leaves;
+    
+    /** recurssive call for deallocation
+     */
     void deallocateAux(HCNode* p);
+    
     unsigned int distinctSymbolSize;
     
     /** encode the encoded file header with the tree structure
@@ -47,8 +51,6 @@ private:
     /** build the huffman coding tree from the header
      */
     HCNode* buildTreeFromHeader(BitInputStream & inStream, unsigned int & byteRemaining);
-    
-    void inOrder(HCNode* p);
     
 public:
     // explicit keyword is used to avoid accidental implicit conversions
@@ -113,9 +115,6 @@ public:
      *  @retrun bool: return true when uncompression executed successfully, false otherwise
      */
     bool uncompress(std::string inputFileName, std::string outputFileName);
-    
-    
-    
     
 };
 

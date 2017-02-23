@@ -15,6 +15,8 @@ HCTree::~HCTree(){
     deallocateAux(root);
 }
 
+/** recurssive call for deallocation
+ */
 void HCTree::deallocateAux(HCNode* p){
     if(p != NULL){
         deallocateAux(p->c0);
@@ -313,32 +315,4 @@ HCNode* HCTree::buildTreeFromHeader(BitInputStream & inStream, unsigned int & by
     }
     return NULL;
 }
-
-
-void HCTree::inOrder(HCNode* p){
-    if(p != NULL){
-        if(p->symbol == 0){
-            std::cout << "interna;" << std::endl;
-        }else{
-            std::cout << p->symbol << std::endl;
-        }
-        inOrder(p->c0);
-        inOrder(p->c1);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

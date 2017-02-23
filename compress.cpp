@@ -12,7 +12,6 @@
 #include "BitOutputStream.h"
 
 int main(int argc, char** argv){
-    
     if(argc < 3){
         std::cerr << "In correct usage, uncompress program requries two arguments, inputFileName and outputFileName" << std::endl;
         return -1;
