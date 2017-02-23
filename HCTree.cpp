@@ -87,17 +87,19 @@ void HCTree::encode(byte symbol, BitOutputStream& out) const{
     //translate the symbol into a encoded binary string
     HCNode* node = leaves[symbol];
     vector<byte> chars;
-    while(node->p != NULL){
-        //check whether this is the rigth child
-        if(node->p->c1 == node){
-            chars.push_back(1);
-        }else{
-            chars.push_back(0);
+    if(node != NULL){
+        while(node->p != NULL){
+            //check whether this is the rigth child
+            if(node->p->c1 == node){
+                chars.push_back(1);
+            }else{
+                chars.push_back(0);
+            }
+            node = node->p;
         }
-        node = node->p;
-    }
-    for(vector<byte>::reverse_iterator itr = chars.rbegin(); itr != chars.rend(); itr++){
-        out.writeBit(*itr);
+        for(vector<byte>::reverse_iterator itr = chars.rbegin(); itr != chars.rend(); itr++){
+            out.writeBit(*itr);
+        }
     }
 }
 
@@ -224,14 +226,13 @@ bool HCTree::compress(std::string inputFileName, std::string outputFileName){
     BitOutputStream bitOutputStream(writeStream);
     encodeTreeStructure(root, bitOutputStream);
     
-    
-
     inputFile.open(inputFileName);
 
     char c;
     while(inputFile.get(c)){
         encode(c, bitOutputStream);
     }
+    inputFile.close();
     
     return false;
 }
