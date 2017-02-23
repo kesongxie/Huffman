@@ -20,6 +20,7 @@ int main(int argc, char** argv){
     std::cout << inputFileName << std::endl;
     string outputFileName = *(++argv);
     std::cout << outputFileName << std::endl;
-    HCTree::uncompress(inputFileName, outputFileName);
+    HCTree huffmanTree;
+    huffmanTree.uncompress(inputFileName, outputFileName);
     return 0;
 }

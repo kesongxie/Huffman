@@ -31,7 +31,6 @@ void HCTree::deallocateAux(HCNode* p){
  *  and leaves[i] points to the leaf node containing byte i.
  */
 void HCTree::build(const vector<int>& freqs){
-    
     //initialize the leaves and write it to the header of the output file
     std::priority_queue<HCNode*, std::vector<HCNode*>, HCNodePtrComp> queue;
 
@@ -42,7 +41,7 @@ void HCTree::build(const vector<int>& freqs){
             queue.push(hcNode);
         }
     }
-    
+    distinctSymbolSize = (unsigned int)queue.size();
     if(queue.size() == 1){
         //the queue contains one node
         HCNode* nodeFirst = queue.top();
@@ -85,7 +84,21 @@ void HCTree::build(const vector<int>& freqs){
  *  tree, and initialize root pointer and leaves vector.
  */
 void HCTree::encode(byte symbol, BitOutputStream& out) const{
-    
+    //translate the symbol into a encoded binary string
+    HCNode* node = leaves[symbol];
+    vector<int> chars;
+    while(node->p != NULL){
+        //check whether this is the rigth child
+        if(node->p->c1 == node){
+            chars.push_back(1);
+        }else{
+            chars.push_back(0);
+        }
+        node = node->p;
+    }
+    for(vector<int>::reverse_iterator itr = chars.rbegin(); itr != chars.rend(); itr++){
+        out.writeBit(*itr);
+    }
 }
 
 /** Write to the given ofstream
@@ -108,6 +121,7 @@ void HCTree::encode(byte symbol, ofstream& out) const{
         }
         node = node->p;
     }
+    
     for(vector<byte>::reverse_iterator itr = chars.rbegin(); itr != chars.rend(); itr++){
         out << *itr;
     }
@@ -119,7 +133,21 @@ void HCTree::encode(byte symbol, ofstream& out) const{
  *  tree, and initialize root pointer and leaves vector.
  */
 int HCTree::decode(BitInputStream& in) const{
-    return 0;
+    //construct the tree based on the header.
+    HCNode* p = root;
+    while(p->c0 != NULL || p->c1 != NULL){
+        //not the leaf yet
+        int bit = in.readBit();
+        if(bit == 1){
+            //go to the c1
+            p = p->c1;
+        }else{
+            //go to the c0
+            p = p->c0;
+        }
+    }
+    return p->symbol;
+
 }
 
 /** Return the symbol coded in the next sequence of bits (represented as
@@ -131,7 +159,6 @@ int HCTree::decode(BitInputStream& in) const{
  */
 int HCTree::decode(ifstream& in) const{
     //construct the tree based on the header.
-    //10010010101111000001111100
     HCNode* p = root;
     char c;
     while(p->c0 != NULL || p->c1 != NULL){
@@ -154,13 +181,26 @@ int HCTree::decode(ifstream& in) const{
 
 /** compress file for given input file name, and output to the given destination
  *  @param inputFileName : input file name
- *  @param outputFileName
+ *  @param outputFileName : the file where all the encoded data go
  *  @retrun bool: return true when compression executed successfully, false otherwise
  */
 bool HCTree::compress(std::string inputFileName, std::string outputFileName){
-    HCTree huffmanTree;
-    vector<int> freq(256, 0);
     
+    //read the total of bytes needed to be encoded
+    std::ifstream readStream;
+    readStream.open(inputFileName);
+    readStream.seekg(0, ios::end);
+    long long totalBytes = readStream.tellg();
+    readStream.close();
+    
+    //write the total of bytes needed to be encoded to the output file
+    std::ofstream writeStream;
+    writeStream.open(outputFileName);
+    writeStream.write((char *) & totalBytes, sizeof(long long));
+    
+    
+    //build the huffman coding tree from the frequence counter
+    vector<int> freq(256, 0);
     std::ifstream inputFile;
     inputFile.open(inputFileName);
     if(inputFile.is_open()){
@@ -169,30 +209,32 @@ bool HCTree::compress(std::string inputFileName, std::string outputFileName){
             freq[c] += 1;
         }
     }else{
-        std::cerr << "file open failed" <<std::endl;
+        std::cerr << "file open failed" << std::endl;
         return false;
     }
+    inputFile.close();
     
-    //write header to the output file
-    std::ofstream outputFile (outputFileName);
+    //build the coding tree
+    build(freq);
     
-    for(auto counter : freq){
-        outputFile << counter << "\n";
-    }
+    //write the distinct symbol size to the header
+    std::cout << "distinct symbol size: " << distinctSymbolSize << std::endl;
+    writeStream.write((char *) & distinctSymbolSize, sizeof(unsigned int));
     
-    //build the huffman coding tree from the frequence counter
-    huffmanTree.build(freq);
+    //encode the actual tree structure
+    BitOutputStream bitOutputStream(writeStream);
+    encodeTreeStructure(root, bitOutputStream);
     
-    //use the huffman coding tree to encode each byte from the input
-    inputFile.clear(); //clear the eof flag
-    inputFile.seekg(0, ios::beg); //point to the begining of the input file
+    
+
+    inputFile.open(inputFileName);
+
     char c;
     while(inputFile.get(c)){
-        huffmanTree.encode(c, outputFile);
+        encode(c, bitOutputStream);
     }
-    inputFile.close();
-    outputFile.close();
-    return true;
+    
+    return false;
 }
 
 
@@ -202,39 +244,96 @@ bool HCTree::compress(std::string inputFileName, std::string outputFileName){
  *  @retrun bool: return true when uncompression executed successfully, false otherwise
  */
 bool HCTree::uncompress(std::string inputFileName, std::string outputFileName){
-    std::ifstream inputFile(inputFileName);
-    vector<int> freq(256, 0);
-    if(inputFile.is_open()){
-        for(int i = 0; i < 256; i++){
-            std::string line;
-            getline(inputFile, line);
-            freq[i] = stoi(line);
-        }
-        HCTree huffmanTree;
-        huffmanTree.build(freq);
-        std::ofstream outputFile (outputFileName);
-        if(outputFile.is_open()){
-            while(1){
-                int c = huffmanTree.decode(inputFile);
-                if(c != -1){
-                   //cast to byte
-                    outputFile << (byte)c;
-                }else{
-                    break;
-                }
-            }
-        }else{
-            std::cerr << "uncompress failed, unable to output file" << std::endl;
-            return false;
-        }
-        outputFile.close();
-    }else{
-        std::cerr << "uncompress failed, can't open input file" << std::endl;
-        return false;
+    
+    //read the total of bytes form the encoded file
+    std::ifstream inStream;
+    inStream.open(inputFileName);
+    long long totalBytesEncoded; //total bytes encoded
+    inStream.read((char * ) & totalBytesEncoded, sizeof(long long));
+    
+    unsigned int uniqueSymbolSize; //the unique symbol size
+    inStream.read((char * ) & uniqueSymbolSize, sizeof(unsigned int));
+    
+    BitInputStream bitInputStream(inStream);
+    
+    //re-construct the coding tree from the header
+    root = buildTreeFromHeader(bitInputStream, uniqueSymbolSize);
+    
+    std::ofstream outputFile;
+    outputFile.open(outputFileName);
+    
+    long long byteRetrived = 0;
+    while(byteRetrived < totalBytesEncoded){
+        byte c = decode(bitInputStream);
+       //cast to byte
+        outputFile << c ;
+        byteRetrived++;
     }
-    inputFile.close();
+    inStream.close();
+    outputFile.close();
     return true;
 }
+
+
+/** encode the encoded file header with the tree structure
+ */
+void HCTree::encodeTreeStructure(HCNode* node, BitOutputStream & bitOutputStream){
+    if(node != NULL){
+        if(node->c0 == NULL && node->c1 == NULL){
+            //this the a leaf node
+            bitOutputStream.writeBit(1);
+            bitOutputStream.writeByte(node->symbol);
+        }else{
+            bitOutputStream.writeBit(0);
+            encodeTreeStructure(node->c0, bitOutputStream);
+            encodeTreeStructure(node->c1, bitOutputStream);
+        }
+    }
+}
+
+
+/** build the huffman coding tree from the header
+ */
+HCNode* HCTree::buildTreeFromHeader(BitInputStream & inStream, unsigned int & byteRemaining){
+    if(byteRemaining > 0){
+        //create the root node
+        //01 ___A____ 01 ___ B ____ 1 ___C____ 0000
+        int bit = inStream.readBit();
+        if(bit == 1){
+            //the next byte is the leaf symbol
+            byte symbol = inStream.readByte();
+            byteRemaining--;
+            return new HCNode(0, symbol);
+        }else{
+            //internal node
+            HCNode* internal = new HCNode(0, 0);
+            internal->c0 = buildTreeFromHeader(inStream, byteRemaining);
+            internal->c1 = buildTreeFromHeader(inStream, byteRemaining);
+            return internal;
+        }
+    }
+    return NULL;
+}
+
+
+void HCTree::inOrder(HCNode* p){
+    if(p != NULL){
+        if(p->symbol == 0){
+            std::cout << "interna;" << std::endl;
+        }else{
+            std::cout << p->symbol << std::endl;
+        }
+        inOrder(p->c0);
+        inOrder(p->c1);
+    }
+}
+
+
+
+
+
+
+
 
 
 

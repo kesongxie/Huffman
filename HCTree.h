@@ -38,11 +38,23 @@ private:
     HCNode* root;
     vector<HCNode*> leaves;
     void deallocateAux(HCNode* p);
-
+    unsigned int distinctSymbolSize;
+    
+    /** encode the encoded file header with the tree structure
+     */
+    void encodeTreeStructure(HCNode* node, BitOutputStream & bitOutputStream);
+    
+    /** build the huffman coding tree from the header
+     */
+    HCNode* buildTreeFromHeader(BitInputStream & inStream, unsigned int & byteRemaining);
+    
+    void inOrder(HCNode* p);
+    
 public:
     // explicit keyword is used to avoid accidental implicit conversions
     explicit HCTree() : root(0) {
         leaves = vector<HCNode*>(256, (HCNode*) 0);
+        distinctSymbolSize = 0;
     }
 
     ~HCTree();
@@ -93,14 +105,16 @@ public:
      *  @param outputFileName
      *  @retrun bool: return true when compression executed successfully, false otherwise
      */
-    static bool compress(std::string inputFileName, std::string outputFileName);
+    bool compress(std::string inputFileName, std::string outputFileName);
     
     /** uncompress file for given input file name, and output to the given destination
      *  @param inputFileName : name for the input file to be uncompressed
      *  @param outputFileName : output file for the uncompressed file
      *  @retrun bool: return true when uncompression executed successfully, false otherwise
      */
-    static bool uncompress(std::string inputFileName, std::string outputFileName);
+    bool uncompress(std::string inputFileName, std::string outputFileName);
+    
+    
     
     
 };
