@@ -2,6 +2,7 @@
 *
 
 # Except for these:
+!refactoredCode
 !.gitignore
 !Makefile
 !refcompress
