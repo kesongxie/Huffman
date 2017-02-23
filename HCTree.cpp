@@ -96,7 +96,7 @@ void HCTree::encode(byte symbol, BitOutputStream& out) const{
         }
         node = node->p;
     }
-    for(vector<int>::reverse_iterator itr = chars.rbegin(); itr != chars.rend(); itr++){
+    for(vector<byte>::reverse_iterator itr = chars.rbegin(); itr != chars.rend(); itr++){
         out.writeBit(*itr);
     }
 }
