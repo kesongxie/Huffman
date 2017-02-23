@@ -21,7 +21,6 @@ void BitInputStream::fill(){
  *  return 0 if the bit read is 0
  */
 int BitInputStream::readBit(){
-    //01010000
     if(nbits == 8){
         fill();
     }
@@ -36,7 +35,6 @@ byte BitInputStream::readByte(){
     byte c = 0;
     for(int i = 7; i >=0; i--){
         c |= (readBit() << i);
-//        std::cout << "bit "<< i << "is:  " << (unsigned int)c << std::endl;
     }
     
     return c;
