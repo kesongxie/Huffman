@@ -86,7 +86,7 @@ void HCTree::build(const vector<int>& freqs){
 void HCTree::encode(byte symbol, BitOutputStream& out) const{
     //translate the symbol into a encoded binary string
     HCNode* node = leaves[symbol];
-    vector<int> chars;
+    vector<byte> chars;
     while(node->p != NULL){
         //check whether this is the rigth child
         if(node->p->c1 == node){
@@ -218,7 +218,6 @@ bool HCTree::compress(std::string inputFileName, std::string outputFileName){
     build(freq);
     
     //write the distinct symbol size to the header
-    std::cout << "distinct symbol size: " << distinctSymbolSize << std::endl;
     writeStream.write((char *) & distinctSymbolSize, sizeof(unsigned int));
     
     //encode the actual tree structure
