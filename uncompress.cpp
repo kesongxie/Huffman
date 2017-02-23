@@ -17,9 +17,7 @@ int main(int argc, char** argv){
     }
     
     string inputFileName = *(++argv);
-    std::cout << inputFileName << std::endl;
     string outputFileName = *(++argv);
-    std::cout << outputFileName << std::endl;
     HCTree huffmanTree;
     huffmanTree.uncompress(inputFileName, outputFileName);
     return 0;

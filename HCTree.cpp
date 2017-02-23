@@ -297,7 +297,6 @@ void HCTree::encodeTreeStructure(HCNode* node, BitOutputStream & bitOutputStream
 HCNode* HCTree::buildTreeFromHeader(BitInputStream & inStream, unsigned int & byteRemaining){
     if(byteRemaining > 0){
         //create the root node
-        //01 ___A____ 01 ___ B ____ 1 ___C____ 0000
         int bit = inStream.readBit();
         if(bit == 1){
             //the next byte is the leaf symbol
